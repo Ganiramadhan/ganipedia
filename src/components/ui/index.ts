@@ -5,3 +5,4 @@ export { Textarea } from './Textarea';
 export { Section, SectionHeader } from './Section';
 export { Badge } from './Badge';
 export { ChatWidget } from './ChatWidget';
+export { ScrollToTop } from './ScrollToTop';

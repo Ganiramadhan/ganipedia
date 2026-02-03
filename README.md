@@ -75,6 +75,7 @@ Website landing page profesional untuk jasa pembuatan website dan solusi digital
 ### Prerequisites
 - Node.js 18+ 
 - PNPM (recommended) atau NPM
+- Docker & Docker Compose (optional, untuk deployment)
 
 ### Installation
 
@@ -94,22 +95,20 @@ pnpm install
 pnpm dev
 \`\`\`
 
-4. **Open browser**
-\`\`\`
-http://localhost:5173
-\`\`\`
+Server akan berjalan di \`http://localhost:3001\`
 
 ## 📦 Available Scripts
 
 | Script | Description |
 |--------|-------------|
-| \`pnpm dev\` | Start development server |
+| \`pnpm dev\` | Start development server (port 3001) |
 | \`pnpm build\` | Build for production |
 | \`pnpm preview\` | Preview production build |
 | \`pnpm lint\` | Run ESLint |
 
 ## 🏭 Production Build
 
+### Standard Build
 \`\`\`bash
 # Build for production
 pnpm build
@@ -119,6 +118,48 @@ pnpm preview
 \`\`\`
 
 Build output akan tersedia di folder \`dist/\`
+
+### 🐳 Docker Deployment
+
+**Build Docker Image:**
+\`\`\`bash
+docker build -t ganipedia:latest .
+\`\`\`
+
+**Run Container (maps internal port 80 to external 3001):**
+\`\`\`bash
+docker run -d -p 3001:80 --name ganipedia ganipedia:latest
+\`\`\`
+
+**Using Docker Compose:**
+\`\`\`bash
+docker-compose up -d
+\`\`\`
+
+Website akan tersedia di \`http://localhost:3001\`
+
+**Stop Container:**
+\`\`\`bash
+docker stop ganipedia
+# or with docker-compose
+docker-compose down
+\`\`\`
+
+### 🚀 Production Deployment
+
+**Nginx Configuration:**
+- Internal Port: 80 (nginx default)
+- External Port: 3001 (mapped via docker)
+- Gzip compression enabled
+- Static assets caching (1 year)
+- SPA routing support
+- Security headers configured
+
+**Environment Variables:**
+\`\`\`bash
+# Optional - set in Dockerfile or docker-compose.yml
+NODE_ENV=production
+\`\`\`
 
 ## 📱 Portfolio Projects
 

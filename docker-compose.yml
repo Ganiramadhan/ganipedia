@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  ganipedia:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ganipedia-web
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - ganipedia-network
+
+networks:
+  ganipedia-network:
+    driver: bridge

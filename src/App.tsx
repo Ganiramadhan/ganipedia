@@ -8,7 +8,7 @@ import {
   FAQSection,
   ContactSection,
 } from '@/components/sections';
-import { ChatWidget } from '@/components/ui';
+import { ChatWidget, ScrollToTop } from '@/components/ui';
 import { LanguageProvider } from '@/contexts';
 
 function App() {
@@ -27,6 +27,7 @@ function App() {
         </main>
         <Footer />
         <ChatWidget />
+        <ScrollToTop />
       </div>
     </LanguageProvider>
   );

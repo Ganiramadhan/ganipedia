@@ -1,5 +1,5 @@
 import { useState, useEffect, type FC } from 'react';
-import { Menu, X, Code2 } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { navigationItems } from '@/data';
 import { Button } from '@/components/ui';
 import { useScrollspy } from '@/hooks';
@@ -26,6 +26,7 @@ const FlagEN: FC<{ className?: string }> = ({ className }) => (
 export const Navbar: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const { language, toggleLanguage, t } = useLanguage();
   
   const sectionIds = navigationItems.map((item) => item.id);
@@ -43,6 +44,11 @@ export const Navbar: FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+      
+      // Calculate scroll progress
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / scrollHeight) * 100;
+      setScrollProgress(Math.min(progress, 100));
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -65,6 +71,16 @@ export const Navbar: FC = () => {
           : 'bg-transparent'
       }`}
     >
+      {/* Scroll Progress Bar - Only show when scrolled */}
+      {scrollProgress > 0 && (
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-200/50">
+          <div 
+            className="h-full bg-linear-to-r from-primary-500 via-primary-600 to-primary-500 transition-all duration-150"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+      )}
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -76,9 +92,11 @@ export const Navbar: FC = () => {
               handleNavClick('#home');
             }}
           >
-            <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
-              <Code2 className="w-6 h-6 text-white" />
-            </div>
+            <img 
+              src="/ganipedia-logo.jpg" 
+              alt="Ganipedia" 
+              className="w-10 h-10 rounded-xl object-cover shadow-md"
+            />
             <span
               className={`transition-colors duration-300 ${
                 isScrolled ? 'text-slate-900' : 'text-white'

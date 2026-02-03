@@ -1,21 +1,109 @@
-import { useState, type FC } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { useState, useEffect, useMemo, type FC } from 'react';
+import { ExternalLink, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { portfolios } from '@/data';
 import { Section, SectionHeader, Badge } from '@/components/ui';
 import { useLanguage } from '@/contexts';
 
+interface LightboxState {
+  isOpen: boolean;
+  currentImage: string;
+  currentTitle: string;
+  portfolioIndex: number;
+  imageIndex: number;
+}
+
 export const PortfolioSection: FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const allLabel = t('portfolio.all');
   
   const categories = [allLabel, ...new Set(portfolios.map((p) => p.category))];
   const [activeCategory, setActiveCategory] = useState(allLabel);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState<Record<string, number>>({});
+  const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({});
+  const [lightbox, setLightbox] = useState<LightboxState>({
+    isOpen: false,
+    currentImage: '',
+    currentTitle: '',
+    portfolioIndex: 0,
+    imageIndex: 0,
+  });
 
-  const filteredPortfolios =
-    activeCategory === allLabel
+  const filteredPortfolios = useMemo(
+    () => activeCategory === allLabel
       ? portfolios
-      : portfolios.filter((p) => p.category === activeCategory);
+      : portfolios.filter((p) => p.category === activeCategory),
+    [activeCategory, allLabel]
+  );
+
+  // Initialize active image index for each portfolio
+  useEffect(() => {
+    const initialIndex: Record<string, number> = {};
+    portfolios.forEach(p => {
+      initialIndex[p.id] = 0;
+    });
+    setActiveImageIndex(initialIndex);
+  }, []);
+
+  const openLightbox = (portfolioIndex: number, imageIndex: number) => {
+    const portfolio = filteredPortfolios[portfolioIndex];
+    const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
+    setLightbox({
+      isOpen: true,
+      currentImage: images[imageIndex],
+      currentTitle: portfolio.title,
+      portfolioIndex,
+      imageIndex,
+    });
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    setLightbox(prev => ({ ...prev, isOpen: false }));
+    document.body.style.overflow = 'auto';
+  };
+
+  const navigateLightbox = (direction: 'prev' | 'next') => {
+    const portfolio = filteredPortfolios[lightbox.portfolioIndex];
+    const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
+    let newImageIndex: number;
+    
+    if (direction === 'next') {
+      newImageIndex = (lightbox.imageIndex + 1) % images.length;
+    } else {
+      newImageIndex = (lightbox.imageIndex - 1 + images.length) % images.length;
+    }
+    
+    setLightbox(prev => ({
+      ...prev,
+      currentImage: images[newImageIndex],
+      imageIndex: newImageIndex,
+    }));
+  };
+
+  const handleThumbnailClick = (portfolioId: string, index: number) => {
+    setActiveImageIndex(prev => ({
+      ...prev,
+      [portfolioId]: index,
+    }));
+  };
+
+  const handleImageLoad = (imageKey: string) => {
+    setImageLoaded(prev => ({ ...prev, [imageKey]: true }));
+  };
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightbox.isOpen) return;
+      
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') navigateLightbox('next');
+      if (e.key === 'ArrowLeft') navigateLightbox('prev');
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightbox.isOpen, lightbox.portfolioIndex, lightbox.imageIndex]);
 
   return (
     <Section id="portfolio" variant="gray">
@@ -31,10 +119,10 @@ export const PortfolioSection: FC = () => {
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${
+            className={`px-6 py-2.5 rounded-full font-medium transition-all duration-200 ${
               activeCategory === category
                 ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30'
-                : 'bg-white text-slate-600 hover:bg-primary-50 hover:text-primary-600'
+                : 'bg-white text-slate-600 hover:bg-primary-50 hover:text-primary-600 border border-slate-200'
             }`}
           >
             {category}
@@ -44,70 +132,258 @@ export const PortfolioSection: FC = () => {
 
       {/* Portfolio Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredPortfolios.map((portfolio) => (
-          <div
-            key={portfolio.id}
-            className="group relative bg-white rounded-2xl overflow-hidden shadow-lg shadow-slate-200/50 hover:shadow-2xl hover:shadow-primary-500/10 transition-all duration-500"
-            onMouseEnter={() => setHoveredItem(portfolio.id)}
-            onMouseLeave={() => setHoveredItem(null)}
-          >
-            {/* Image */}
-            <div className="relative aspect-4/3 overflow-hidden">
-              <img
-                src={portfolio.image}
-                alt={portfolio.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              {/* Overlay */}
-              <div
-                className={`absolute inset-0 bg-linear-to-t from-slate-900/90 via-slate-900/50 to-transparent transition-opacity duration-300 ${
-                  hoveredItem === portfolio.id ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex gap-3">
-                    {portfolio.link && (
-                      <a 
-                        href={portfolio.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white hover:bg-white hover:text-primary-600 transition-all duration-300"
-                        aria-label="Open external link"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                      </a>
-                    )}
+        {filteredPortfolios.map((portfolio, portfolioIndex) => {
+          const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
+          const currentImageIndex = activeImageIndex[portfolio.id] || 0;
+          
+          return (
+            <div
+              key={portfolio.id}
+              className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-200 border border-slate-100 hover:border-primary-200"
+            >
+              {/* Image Container */}
+              <div className="relative bg-slate-50 p-3 pb-2">
+                {/* Main Image with border */}
+                <div 
+                  className="relative aspect-video overflow-hidden cursor-pointer rounded-xl border border-slate-200 bg-white shadow-sm"
+                  onClick={() => openLightbox(portfolioIndex, currentImageIndex)}
+                >
+                  {/* Loading placeholder */}
+                  {!imageLoaded[`${portfolio.id}-${currentImageIndex}`] && (
+                    <div className="absolute inset-0 bg-slate-100 animate-pulse" />
+                  )}
+                  
+                  <img
+                    src={images[currentImageIndex]}
+                    alt={portfolio.title}
+                    loading="lazy"
+                    className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+                      imageLoaded[`${portfolio.id}-${currentImageIndex}`] ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    onLoad={() => handleImageLoad(`${portfolio.id}-${currentImageIndex}`)}
+                  />
+                  
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-primary-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary-600 shadow-lg">
+                      <ZoomIn className="w-5 h-5" />
+                    </div>
                   </div>
+
+                  {/* Category Badge */}
+                  <div className="absolute top-3 left-3">
+                    <Badge variant="primary">{portfolio.category}</Badge>
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newIndex = (currentImageIndex - 1 + images.length) % images.length;
+                          handleThumbnailClick(portfolio.id, newIndex);
+                        }}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white shadow-md rounded-full flex items-center justify-center text-slate-600 hover:text-primary-600 transition-all opacity-0 group-hover:opacity-100"
+                        aria-label="Previous image"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const newIndex = (currentImageIndex + 1) % images.length;
+                          handleThumbnailClick(portfolio.id, newIndex);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white shadow-md rounded-full flex items-center justify-center text-slate-600 hover:text-primary-600 transition-all opacity-0 group-hover:opacity-100"
+                        aria-label="Next image"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Thumbnail Gallery */}
+                {images.length > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-3 px-2">
+                    {images.map((img, imgIndex) => (
+                      <button
+                        key={imgIndex}
+                        onClick={() => handleThumbnailClick(portfolio.id, imgIndex)}
+                        className={`relative shrink-0 w-14 h-9 rounded-md overflow-hidden transition-all duration-200 border-2 ${
+                          currentImageIndex === imgIndex 
+                            ? 'border-primary-500 shadow-md scale-105' 
+                            : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`${portfolio.title} - ${imgIndex + 1}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="p-5 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors line-clamp-1 flex-1">
+                    {portfolio.title}
+                  </h3>
+                  {portfolio.link && portfolio.link !== '#' && (
+                    <a
+                      href={portfolio.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 w-9 h-9 bg-primary-50 hover:bg-primary-600 hover:text-white rounded-lg flex items-center justify-center text-primary-600 transition-all shadow-sm hover:shadow"
+                      aria-label="Visit site"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  )}
+                </div>
+                
+                <p className="text-slate-600 text-sm leading-relaxed line-clamp-2 min-h-10">
+                  {portfolio.description}
+                </p>
+                
+                {/* Technologies */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {portfolio.technologies.slice(0, 3).map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-2.5 py-1 bg-slate-50 text-slate-700 text-xs font-medium rounded border border-slate-200"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  {portfolio.technologies.length > 3 && (
+                    <span className="px-2.5 py-1 bg-primary-50 text-primary-700 text-xs font-semibold rounded border border-primary-200">
+                      +{portfolio.technologies.length - 3}
+                    </span>
+                  )}
                 </div>
               </div>
-              {/* Category Badge */}
-              <div className="absolute top-4 left-4">
-                <Badge variant="primary">{portfolio.category}</Badge>
-              </div>
             </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                {portfolio.title}
-              </h3>
-              <p className="text-slate-600 text-sm mb-4 line-clamp-2">
-                {portfolio.description}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {portfolio.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* View All CTA */}
+      <div className="mt-12 text-center">
+        <p className="text-slate-600">
+          {language === 'id' 
+            ? 'Ingin melihat lebih banyak project?' 
+            : 'Want to see more projects?'}
+          {' '}
+          <a 
+            href="#contact" 
+            onClick={(e) => {
+              e.preventDefault();
+              document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="text-primary-600 font-semibold hover:underline"
+          >
+            {language === 'id' ? 'Hubungi Kami' : 'Contact Us'}
+          </a>
+        </p>
+      </div>
+
+      {/* Lightbox Modal */}
+      {lightbox.isOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+          onClick={closeLightbox}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeLightbox}
+            className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+            aria-label="Close lightbox"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Navigation Buttons */}
+          {(() => {
+            const portfolio = filteredPortfolios[lightbox.portfolioIndex];
+            const images = portfolio?.images && portfolio.images.length > 0 ? portfolio.images : [portfolio?.image];
+            return images.length > 1 ? (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigateLightbox('prev'); }}
+                  className="absolute left-4 md:left-8 w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-7 h-7" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigateLightbox('next'); }}
+                  className="absolute right-4 md:right-8 w-14 h-14 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-7 h-7" />
+                </button>
+              </>
+            ) : null;
+          })()}
+
+          {/* Image Container */}
+          <div 
+            className="max-w-6xl w-full mx-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="relative bg-white/5 rounded-2xl p-2">
+              <img
+                src={lightbox.currentImage}
+                alt={lightbox.currentTitle}
+                className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+              />
+            </div>
+            <div className="text-center mt-6">
+              <h3 className="text-2xl font-bold text-white">{lightbox.currentTitle}</h3>
+              {(() => {
+                const portfolio = filteredPortfolios[lightbox.portfolioIndex];
+                const images = portfolio?.images && portfolio.images.length > 0 ? portfolio.images : [portfolio?.image];
+                return images.length > 1 ? (
+                  <p className="text-white/60 text-sm mt-2">
+                    {lightbox.imageIndex + 1} / {images.length}
+                  </p>
+                ) : null;
+              })()}
+            </div>
+            
+            {/* Thumbnail Navigation in Lightbox */}
+            {(() => {
+              const portfolio = filteredPortfolios[lightbox.portfolioIndex];
+              const images = portfolio?.images && portfolio.images.length > 0 ? portfolio.images : [portfolio?.image];
+              return images.length > 1 ? (
+                <div className="flex justify-center gap-2 mt-6 overflow-x-auto pb-2">
+                  {images.map((img, idx) => (
+                    <button
+                      aria-label='test'
+                      key={idx}
+                      onClick={() => setLightbox(prev => ({ ...prev, currentImage: img, imageIndex: idx }))}
+                      className={`shrink-0 w-20 h-12 rounded-lg overflow-hidden transition-all border-2 ${
+                        lightbox.imageIndex === idx 
+                          ? 'border-primary-500 scale-105' 
+                          : 'border-transparent opacity-50 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              ) : null;
+            })()}
+          </div>
+        </div>
+      )}
     </Section>
   );
 };

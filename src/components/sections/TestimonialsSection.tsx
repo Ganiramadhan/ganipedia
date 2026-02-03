@@ -40,7 +40,7 @@ export const TestimonialsSection: FC = () => {
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.id}
-                className={`transition-all duration-500 ${
+                className={`transition-all duration-300 ${
                   index === currentIndex
                     ? 'opacity-100 translate-x-0'
                     : 'opacity-0 translate-x-8 absolute inset-0 pointer-events-none'
@@ -72,6 +72,7 @@ export const TestimonialsSection: FC = () => {
                       <img
                         src={testimonial.avatar}
                         alt={testimonial.name}
+                        loading="lazy"
                         className="w-14 h-14 rounded-full object-cover ring-4 ring-white/20"
                       />
                       <div>
@@ -139,6 +140,7 @@ export const TestimonialsSection: FC = () => {
               <img
                 src={testimonial.avatar}
                 alt={testimonial.name}
+                loading="lazy"
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>

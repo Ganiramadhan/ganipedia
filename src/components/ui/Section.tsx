@@ -8,7 +8,7 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
 const variantStyles = {
   default: 'bg-white',
   gray: 'bg-slate-50',
-  gradient: 'bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 text-white',
+  gradient: 'bg-linear-to-br from-primary-600 via-primary-700 to-primary-900 text-white',
 };
 
 export const Section: FC<SectionProps> = ({
@@ -19,7 +19,7 @@ export const Section: FC<SectionProps> = ({
 }) => {
   return (
     <section
-      className={`py-20 md:py-28 ${variantStyles[variant]} ${className}`}
+      className={`py-16 md:py-24 ${variantStyles[variant]} ${className}`}
       {...props}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">

@@ -1,13 +1,11 @@
 import type { FC } from 'react';
 import {
-  Code2,
   Mail,
   Phone,
   MapPin,
   Instagram,
   Linkedin,
   Github,
-  ArrowUp,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts';
 
@@ -20,10 +18,6 @@ const ADDRESS_LINE2 = 'Kec. Cibeunying Kaler, Kota Bandung, Jawa Barat 40191';
 export const Footer: FC = () => {
   const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   const handleNavClick = (href: string) => {
     const element = document.querySelector(href);
@@ -71,9 +65,11 @@ export const Footer: FC = () => {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <a href="#home" className="flex items-center gap-2 text-2xl font-bold mb-6">
-              <div className="w-10 h-10 bg-linear-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center">
-                <Code2 className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/ganipedia-logo.jpg" 
+                alt="Ganipedia" 
+                className="w-10 h-10 rounded-xl object-cover shadow-md"
+              />
               <span>
                 Gani<span className="text-primary-400">pedia</span>
               </span>
@@ -209,14 +205,6 @@ export const Footer: FC = () => {
         </div>
       </div>
 
-      {/* Scroll to Top Button */}
-      <button
-        onClick={scrollToTop}
-        className="fixed bottom-8 right-8 w-12 h-12 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg shadow-primary-500/30 flex items-center justify-center transition-all duration-300 hover:-translate-y-1 z-40"
-        aria-label="Scroll to top"
-      >
-        <ArrowUp className="w-5 h-5" />
-      </button>
     </footer>
   );
 };

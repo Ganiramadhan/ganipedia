@@ -15,6 +15,7 @@ export interface Portfolio {
   title: string;
   category: string;
   image: string;
+  images: string[]; // Multiple images for gallery
   description: string;
   technologies: string[];
   link?: string;
