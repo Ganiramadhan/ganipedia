@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo, type FC } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type FC } from 'react';
 import { ExternalLink, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { portfolios } from '@/data';
 import { Section, SectionHeader, Badge } from '@/components/ui';
 import { useLanguage } from '@/contexts';
+import { normalizeImagePath } from '@/utils';
 
 interface LightboxState {
   isOpen: boolean;
@@ -12,14 +13,97 @@ interface LightboxState {
   imageIndex: number;
 }
 
+interface ImageLoaderProps {
+  src: string;
+  alt: string;
+  className?: string;
+  onLoad?: () => void;
+  priority?: boolean;
+}
+
+// Optimized image component with IntersectionObserver and error handling
+const ImageLoader: FC<ImageLoaderProps> = ({ src, alt, className = '', onLoad, priority = false }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
+  const [hasError, setHasError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (priority) return; // Skip observer for priority images
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { rootMargin: '100px' } // Start loading 100px before visible
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [priority]);
+
+  const handleLoad = () => {
+    setIsLoaded(true);
+    setHasError(false);
+    onLoad?.();
+  };
+
+  const handleError = () => {
+    setHasError(true);
+    setIsLoaded(true);
+  };
+
+  // Normalize image path for production
+  const imageSrc = normalizeImagePath(src);
+
+  return (
+    <div className="relative w-full h-full bg-slate-100">
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200 animate-pulse" />
+      )}
+      {hasError ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-100">
+          <div className="text-center text-slate-400">
+            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="text-xs">Image not found</p>
+          </div>
+        </div>
+      ) : (
+        <img
+          ref={imgRef}
+          src={isInView ? imageSrc : undefined}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          className={`${className} transition-opacity duration-300 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+      )}
+    </div>
+  );
+};
+
 export const PortfolioSection: FC = () => {
   const { t, language } = useLanguage();
   const allLabel = t('portfolio.all');
+  const sectionRef = useRef<HTMLDivElement>(null);
   
-  const categories = [allLabel, ...new Set(portfolios.map((p) => p.category))];
+  const categories = useMemo(() => [allLabel, ...new Set(portfolios.map((p) => p.category))], [allLabel]);
   const [activeCategory, setActiveCategory] = useState(allLabel);
   const [activeImageIndex, setActiveImageIndex] = useState<Record<string, number>>({});
-  const [imageLoaded, setImageLoaded] = useState<Record<string, boolean>>({});
   const [lightbox, setLightbox] = useState<LightboxState>({
     isOpen: false,
     currentImage: '',
@@ -44,7 +128,7 @@ export const PortfolioSection: FC = () => {
     setActiveImageIndex(initialIndex);
   }, []);
 
-  const openLightbox = (portfolioIndex: number, imageIndex: number) => {
+  const openLightbox = useCallback((portfolioIndex: number, imageIndex: number) => {
     const portfolio = filteredPortfolios[portfolioIndex];
     const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
     setLightbox({
@@ -55,14 +139,14 @@ export const PortfolioSection: FC = () => {
       imageIndex,
     });
     document.body.style.overflow = 'hidden';
-  };
+  }, [filteredPortfolios]);
 
-  const closeLightbox = () => {
+  const closeLightbox = useCallback(() => {
     setLightbox(prev => ({ ...prev, isOpen: false }));
     document.body.style.overflow = 'auto';
-  };
+  }, []);
 
-  const navigateLightbox = (direction: 'prev' | 'next') => {
+  const navigateLightbox = useCallback((direction: 'prev' | 'next') => {
     const portfolio = filteredPortfolios[lightbox.portfolioIndex];
     const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
     let newImageIndex: number;
@@ -78,18 +162,14 @@ export const PortfolioSection: FC = () => {
       currentImage: images[newImageIndex],
       imageIndex: newImageIndex,
     }));
-  };
+  }, [filteredPortfolios, lightbox.portfolioIndex, lightbox.imageIndex]);
 
-  const handleThumbnailClick = (portfolioId: string, index: number) => {
+  const handleThumbnailClick = useCallback((portfolioId: string, index: number) => {
     setActiveImageIndex(prev => ({
       ...prev,
       [portfolioId]: index,
     }));
-  };
-
-  const handleImageLoad = (imageKey: string) => {
-    setImageLoaded(prev => ({ ...prev, [imageKey]: true }));
-  };
+  }, []);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -103,10 +183,10 @@ export const PortfolioSection: FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [lightbox.isOpen, lightbox.portfolioIndex, lightbox.imageIndex]);
+  }, [lightbox.isOpen, closeLightbox, navigateLightbox]);
 
   return (
-    <Section id="portfolio" variant="gray">
+    <Section id="portfolio" variant="gray" ref={sectionRef}>
       <SectionHeader
         subtitle={t('portfolio.subtitle')}
         title={t('portfolio.title')}
@@ -135,6 +215,7 @@ export const PortfolioSection: FC = () => {
         {filteredPortfolios.map((portfolio, portfolioIndex) => {
           const images = portfolio.images && portfolio.images.length > 0 ? portfolio.images : [portfolio.image];
           const currentImageIndex = activeImageIndex[portfolio.id] || 0;
+          const isPriority = portfolioIndex < 6; // First 6 images are priority for above-the-fold content
           
           return (
             <div
@@ -148,19 +229,11 @@ export const PortfolioSection: FC = () => {
                   className="relative aspect-video overflow-hidden cursor-pointer rounded-xl border border-slate-200 bg-white shadow-sm"
                   onClick={() => openLightbox(portfolioIndex, currentImageIndex)}
                 >
-                  {/* Loading placeholder */}
-                  {!imageLoaded[`${portfolio.id}-${currentImageIndex}`] && (
-                    <div className="absolute inset-0 bg-slate-100 animate-pulse" />
-                  )}
-                  
-                  <img
+                  <ImageLoader
                     src={images[currentImageIndex]}
                     alt={portfolio.title}
-                    loading="lazy"
-                    className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
-                      imageLoaded[`${portfolio.id}-${currentImageIndex}`] ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    onLoad={() => handleImageLoad(`${portfolio.id}-${currentImageIndex}`)}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    priority={isPriority}
                   />
                   
                   {/* Hover Overlay */}
@@ -209,6 +282,7 @@ export const PortfolioSection: FC = () => {
                   <div className="flex items-center justify-center gap-2 mt-3 px-2">
                     {images.map((img, imgIndex) => (
                       <button
+                        aria-label='border'
                         key={imgIndex}
                         onClick={() => handleThumbnailClick(portfolio.id, imgIndex)}
                         className={`relative shrink-0 w-14 h-9 rounded-md overflow-hidden transition-all duration-200 border-2 ${
@@ -217,10 +291,9 @@ export const PortfolioSection: FC = () => {
                             : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
                         }`}
                       >
-                        <img
+                        <ImageLoader
                           src={img}
                           alt={`${portfolio.title} - ${imgIndex + 1}`}
-                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                       </button>
@@ -338,11 +411,12 @@ export const PortfolioSection: FC = () => {
             className="max-w-6xl w-full mx-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative bg-white/5 rounded-2xl p-2">
-              <img
+            <div className="relative bg-white/5 rounded-2xl p-2 overflow-hidden">
+              <ImageLoader
                 src={lightbox.currentImage}
                 alt={lightbox.currentTitle}
                 className="w-full h-auto max-h-[70vh] object-contain rounded-xl"
+                priority={true}
               />
             </div>
             <div className="text-center mt-6">
@@ -366,7 +440,7 @@ export const PortfolioSection: FC = () => {
                 <div className="flex justify-center gap-2 mt-6 overflow-x-auto pb-2">
                   {images.map((img, idx) => (
                     <button
-                      aria-label='test'
+                      aria-label={`View image ${idx + 1}`}
                       key={idx}
                       onClick={() => setLightbox(prev => ({ ...prev, currentImage: img, imageIndex: idx }))}
                       className={`shrink-0 w-20 h-12 rounded-lg overflow-hidden transition-all border-2 ${
@@ -375,7 +449,7 @@ export const PortfolioSection: FC = () => {
                           : 'border-transparent opacity-50 hover:opacity-100'
                       }`}
                     >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <ImageLoader src={img} alt="" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>

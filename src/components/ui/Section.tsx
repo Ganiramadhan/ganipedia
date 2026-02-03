@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import type { FC, ReactNode, HTMLAttributes } from 'react';
 
 interface SectionProps extends HTMLAttributes<HTMLElement> {
@@ -11,14 +12,15 @@ const variantStyles = {
   gradient: 'bg-linear-to-br from-primary-600 via-primary-700 to-primary-900 text-white',
 };
 
-export const Section: FC<SectionProps> = ({
+export const Section = forwardRef<HTMLElement, SectionProps>(({
   children,
   variant = 'default',
   className = '',
   ...props
-}) => {
+}, ref) => {
   return (
     <section
+      ref={ref}
       className={`py-16 md:py-24 ${variantStyles[variant]} ${className}`}
       {...props}
     >
@@ -27,7 +29,7 @@ export const Section: FC<SectionProps> = ({
       </div>
     </section>
   );
-};
+});
 
 // Section Header
 interface SectionHeaderProps {

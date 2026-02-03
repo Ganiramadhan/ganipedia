@@ -21,8 +21,12 @@ Website landing page profesional untuk jasa pembuatan website dan solusi digital
 - Toggle bahasa dengan icon bendera
 
 ### 💼 **Portfolio Showcase**
-- 8 project portfolio dengan detail lengkap
+- Optimized image loading with lazy loading
+- Interactive image gallery with lightbox
 - Filter berdasarkan kategori
+- Multiple images per portfolio
+- Image validation on build
+- Error handling for missing images
 - Link eksternal ke website asli
 - Responsive grid layout
 
@@ -102,9 +106,10 @@ Server akan berjalan di \`http://localhost:3001\`
 | Script | Description |
 |--------|-------------|
 | \`pnpm dev\` | Start development server (port 3001) |
-| \`pnpm build\` | Build for production |
-| \`pnpm preview\` | Preview production build |
-| \`pnpm lint\` | Run ESLint |
+| `pnpm build` | Build for production (validates images first) |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm validate:images` | Validate all portfolio images exist |
 
 ## 🏭 Production Build
 
@@ -183,8 +188,32 @@ Edit \`src/data/index.ts\` untuk update:
 - Statistics
 - Navigation items
 
+**Important**: Setelah menambah portfolio baru dengan gambar, jalankan:
+```bash
+pnpm validate:images
+```
+
+### **Adding Portfolio Images**
+1. Place images in `public/projects/` folder
+2. Update portfolio data in `src/data/index.ts`
+3. Reference using path: `/projects/your-image.png`
+4. Run `pnpm validate:images` to verify
+
+See [docs/IMAGE_OPTIMIZATION.md](docs/IMAGE_OPTIMIZATION.md) for details.
+
 ### **Translations**
-Edit \`src/contexts/LanguageContext.tsx\` untuk menambah/edit translations.
+Edit `src/contexts/LanguageContext.tsx` untuk menambah/edit translations.
+
+## ⚡ Performance Optimizations
+
+- **Lazy Loading**: Images load only when visible
+- **Priority Loading**: First 6 portfolio items load eagerly
+- **Error Handling**: Fallback UI for broken images
+- **IntersectionObserver**: Pre-loads images 100px before viewport
+- **Code Splitting**: Vendor chunking for better caching
+- **Compression**: Gzip enabled for all text assets
+- **Caching**: 1-year cache for static assets
+- **Performance Monitoring**: Core Web Vitals tracking in dev mode
 
 ## 👨‍💻 Author
 

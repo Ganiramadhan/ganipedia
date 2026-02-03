@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate:images": "node scripts/validate-images.js",
+    "prebuild": "node scripts/validate-images.js"
   },
   "dependencies": {
     "react": "^19.2.0",
