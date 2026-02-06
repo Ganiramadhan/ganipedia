@@ -92,16 +92,16 @@ export const portfolios: Portfolio[] = [
     technologies: ['React', 'Tailwind CSS', 'Next.js'],
     link: 'https://batikmerawit.com/',
   },
-  {
-    id: 'portfolio-5',
-    title: 'Drizy E-Commerce',
-    category: 'E-Commerce',
-    image: '/projects/drizy-1.png',
-    images: ['/projects/drizy-1.png', '/projects/drizy-2.png', '/projects/drizy-3.png'],
-    description: 'Platform e-commerce modern untuk produk fashion. Dilengkapi dengan payment gateway terintegrasi, inventory management real-time, customer dashboard, sistem review & rating, dan analytics penjualan komprehensif.',
-    technologies: ['Next.js', 'Stripe', 'Prisma', 'PostgreSQL', 'Redis'],
-    link: '#',
-  },
+  // {
+  //   id: 'portfolio-5',
+  //   title: 'Drizy E-Commerce',
+  //   category: 'E-Commerce',
+  //   image: '/projects/drizy-1.png',
+  //   images: ['/projects/drizy-1.png', '/projects/drizy-2.png', '/projects/drizy-3.png'],
+  //   description: 'Platform e-commerce modern untuk produk fashion. Dilengkapi dengan payment gateway terintegrasi, inventory management real-time, customer dashboard, sistem review & rating, dan analytics penjualan komprehensif.',
+  //   technologies: ['Next.js', 'Stripe', 'Prisma', 'PostgreSQL', 'Redis'],
+  //   link: '#',
+  // },
 ];
 
 // Testimonials Data
