@@ -160,10 +160,8 @@ export const Navbar: FC = () => {
                 </a>
               </li>
             ))}
-            <li className="mt-2">
-              <div className="px-2">
-                <LanguageSelector isScrolled={true} />
-              </div>
+            <li className="mt-3 pt-3 border-t border-slate-200">
+              <LanguageSelector isScrolled={true} isMobile={true} />
             </li>
             <li className="mt-2">
               <Button

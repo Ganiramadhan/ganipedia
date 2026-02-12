@@ -44,9 +44,10 @@ const languageOptions: LanguageOption[] = [
 
 interface LanguageSelectorProps {
   isScrolled: boolean;
+  isMobile?: boolean;
 }
 
-export const LanguageSelector: FC<LanguageSelectorProps> = ({ isScrolled }) => {
+export const LanguageSelector: FC<LanguageSelectorProps> = ({ isScrolled, isMobile = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { language, setLanguage } = useLanguage();
@@ -76,19 +77,30 @@ export const LanguageSelector: FC<LanguageSelectorProps> = ({ isScrolled }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 border ${
-          isScrolled
-            ? 'text-slate-700 bg-white hover:bg-slate-50 border-slate-200 shadow-sm'
-            : 'text-white/95 bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-sm'
+        className={`flex items-center justify-between gap-2 rounded-lg font-medium text-sm transition-all duration-200 border ${
+          isMobile
+            ? 'w-full px-4 py-3 text-slate-700 bg-slate-50 hover:bg-slate-100 border-slate-200'
+            : isScrolled
+            ? 'px-3 py-2 text-slate-700 bg-white hover:bg-slate-50 border-slate-200 shadow-sm'
+            : 'px-3 py-2 text-white/95 bg-white/10 hover:bg-white/20 border-white/20 backdrop-blur-sm'
         }`}
         aria-label="Select language"
         aria-expanded={isOpen}
       >
-        <Globe className="w-4 h-4" />
-        {currentLanguage?.flag}
-        <span className="uppercase font-semibold hidden sm:inline">
-          {currentLanguage?.code}
-        </span>
+        <div className="flex items-center gap-2">
+          <Globe className="w-4 h-4" />
+          {currentLanguage?.flag}
+          <span className={`uppercase font-semibold ${
+            isMobile ? 'inline' : 'hidden sm:inline'
+          }`}>
+            {currentLanguage?.code}
+          </span>
+          <span className={`text-slate-600 ${
+            isMobile ? 'inline ml-1' : 'hidden'
+          }`}>
+            - {currentLanguage?.nativeName}
+          </span>
+        </div>
         <ChevronDown
           className={`w-4 h-4 transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
@@ -99,30 +111,40 @@ export const LanguageSelector: FC<LanguageSelectorProps> = ({ isScrolled }) => {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 w-48 rounded-xl shadow-xl border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
-            isScrolled
-              ? 'bg-white border-slate-200'
-              : 'bg-white/95 backdrop-blur-md border-slate-200/50'
+          className={`absolute mt-2 rounded-xl shadow-xl border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+            isMobile
+              ? 'left-0 right-0 w-full bg-white border-slate-200'
+              : 'right-0 w-48 bg-white border-slate-200'
+          } ${
+            !isMobile && !isScrolled
+              ? 'bg-white/95 backdrop-blur-md border-slate-200/50'
+              : ''
           }`}
         >
           {languageOptions.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+              className={`w-full flex items-center gap-3 text-left transition-colors ${
+                isMobile ? 'px-4 py-3.5' : 'px-4 py-3'
+              } ${
                 language === lang.code
                   ? 'bg-primary-50 text-primary-700'
-                  : 'text-slate-700 hover:bg-slate-50'
+                  : 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
               }`}
             >
               {lang.flag}
-              <div className="flex flex-col">
-                <span className="font-medium text-sm">{lang.name}</span>
-                <span className="text-xs opacity-60">{lang.nativeName}</span>
+              <div className="flex flex-col flex-1">
+                <span className={`font-medium ${
+                  isMobile ? 'text-base' : 'text-sm'
+                }`}>{lang.name}</span>
+                <span className={`opacity-60 ${
+                  isMobile ? 'text-sm' : 'text-xs'
+                }`}>{lang.nativeName}</span>
               </div>
               {language === lang.code && (
                 <svg
-                  className="w-4 h-4 ml-auto text-primary-600"
+                  className="w-5 h-5 text-primary-600 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
