@@ -111,10 +111,10 @@ export const LanguageSelector: FC<LanguageSelectorProps> = ({ isScrolled, isMobi
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute mt-2 rounded-xl shadow-xl border overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 ${
+          className={`rounded-xl border overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200 ${
             isMobile
-              ? 'left-0 right-0 w-full bg-white border-slate-200'
-              : 'right-0 w-48 bg-white border-slate-200'
+              ? 'relative mt-2 w-full bg-white border-slate-200 shadow-md'
+              : 'absolute mt-2 right-0 w-48 bg-white border-slate-200 shadow-xl'
           } ${
             !isMobile && !isScrolled
               ? 'bg-white/95 backdrop-blur-md border-slate-200/50'

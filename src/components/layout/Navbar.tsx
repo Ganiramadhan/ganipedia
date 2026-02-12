@@ -137,11 +137,11 @@ export const Navbar: FC = () => {
 
         {/* Mobile Navigation */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ${
-            isOpen ? 'max-h-125 pb-4' : 'max-h-0'
+          className={`lg:hidden transition-all duration-300 ${
+            isOpen ? 'max-h-[600px] pb-4 overflow-visible' : 'max-h-0 overflow-hidden'
           }`}
         >
-          <ul className="flex flex-col gap-1 bg-white rounded-2xl p-4 shadow-xl">
+          <ul className="flex flex-col gap-1 bg-white rounded-2xl p-4 shadow-xl relative">
             {navigationItems.map((item) => (
               <li key={item.id}>
                 <a
