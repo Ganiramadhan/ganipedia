@@ -8,12 +8,13 @@ import {
   FAQSection,
   ContactSection,
 } from '@/components/sections';
-import { ChatWidget, ScrollToTop } from '@/components/ui';
+import { ChatWidget, ScrollToTop, SEOHead } from '@/components/ui';
 import { LanguageProvider } from '@/contexts';
 
 function App() {
   return (
     <LanguageProvider>
+      <SEOHead />
       <div className="min-h-screen bg-white">
         <Navbar />
         <main>

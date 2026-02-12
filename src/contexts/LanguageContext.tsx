@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export type Language = 'id' | 'en';
 
@@ -16,18 +17,47 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [language, setLanguage] = useState<Language>(() => {
+    // Check URL path first
+    const pathLang = location.pathname.split('/')[1];
+    if (pathLang === 'id' || pathLang === 'en') {
+      return pathLang;
+    }
+    
+    // Then check localStorage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ganipedia-lang');
-      return (saved as Language) || 'id';
+      if (saved === 'id' || saved === 'en') {
+        return saved;
+      }
     }
-    return 'id';
+    
+    // Default to English
+    return 'en';
   });
 
+  // Sync with URL changes
+  useEffect(() => {
+    const pathLang = location.pathname.split('/')[1];
+    if ((pathLang === 'id' || pathLang === 'en') && pathLang !== language) {
+      setLanguage(pathLang);
+      localStorage.setItem('ganipedia-lang', pathLang);
+    }
+  }, [location.pathname, language]);
+
   const handleSetLanguage = useCallback((lang: Language) => {
+    // Smooth transition: update state first
     setLanguage(lang);
     localStorage.setItem('ganipedia-lang', lang);
-  }, []);
+    
+    // Then navigate after a brief moment for smooth transition
+    requestAnimationFrame(() => {
+      navigate(`/${lang}`, { replace: true });
+    });
+  }, [navigate]);
 
   const toggleLanguage = useCallback(() => {
     const newLang = language === 'id' ? 'en' : 'id';

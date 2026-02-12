@@ -1,33 +1,15 @@
 import { useState, useEffect, type FC } from 'react';
 import { Menu, X } from 'lucide-react';
 import { navigationItems } from '@/data';
-import { Button } from '@/components/ui';
+import { Button, LanguageSelector } from '@/components/ui';
 import { useScrollspy } from '@/hooks';
 import { useLanguage } from '@/contexts';
-
-// Flag components
-const FlagID: FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 16" fill="none">
-    <rect width="24" height="8" fill="#FF0000" />
-    <rect y="8" width="24" height="8" fill="#FFFFFF" />
-  </svg>
-);
-
-const FlagEN: FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 16" fill="none">
-    <rect width="24" height="16" fill="#012169" />
-    <path d="M0 0L24 16M24 0L0 16" stroke="white" strokeWidth="2" />
-    <path d="M0 0L24 16M24 0L0 16" stroke="#C8102E" strokeWidth="1" />
-    <path d="M12 0V16M0 8H24" stroke="white" strokeWidth="4" />
-    <path d="M12 0V16M0 8H24" stroke="#C8102E" strokeWidth="2" />
-  </svg>
-);
 
 export const Navbar: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const { language, toggleLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   
   const sectionIds = navigationItems.map((item) => item.id);
   const activeSection = useScrollspy(sectionIds);
@@ -130,24 +112,9 @@ export const Navbar: FC = () => {
             ))}
           </ul>
 
-          {/* Language Toggle & CTA Button */}
+          {/* Language Selector & CTA Button */}
           <div className="hidden lg:flex items-center gap-3">
-            <button
-              onClick={toggleLanguage}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 border ${
-                isScrolled
-                  ? 'text-slate-600 hover:bg-slate-100 border-slate-200'
-                  : 'text-white/90 hover:bg-white/10 border-white/20'
-              }`}
-              aria-label={`Switch to ${language === 'id' ? 'English' : 'Indonesian'}`}
-            >
-              {language === 'id' ? (
-                <FlagID className="w-5 h-4 rounded-sm" />
-              ) : (
-                <FlagEN className="w-5 h-4 rounded-sm" />
-              )}
-              <span className="uppercase font-semibold">{language === 'id' ? 'ID' : 'EN'}</span>
-            </button>
+            <LanguageSelector isScrolled={isScrolled} />
             <Button
               size="sm"
               onClick={() => handleNavClick('#contact')}
@@ -193,18 +160,10 @@ export const Navbar: FC = () => {
                 </a>
               </li>
             ))}
-            <li className="mt-2 flex items-center gap-2">
-              <button
-                onClick={toggleLanguage}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors border border-slate-200"
-              >
-                {language === 'id' ? (
-                  <FlagID className="w-5 h-4 rounded-sm" />
-                ) : (
-                  <FlagEN className="w-5 h-4 rounded-sm" />
-                )}
-                <span>{language === 'id' ? 'Switch to English' : 'Ganti ke Indonesia'}</span>
-              </button>
+            <li className="mt-2">
+              <div className="px-2">
+                <LanguageSelector isScrolled={true} />
+              </div>
             </li>
             <li className="mt-2">
               <Button

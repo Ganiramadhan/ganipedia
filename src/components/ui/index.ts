@@ -6,3 +6,6 @@ export { Section, SectionHeader } from './Section';
 export { Badge } from './Badge';
 export { ChatWidget } from './ChatWidget';
 export { ScrollToTop } from './ScrollToTop';
+export { SEOHead } from './SEOHead';
+export { LanguageSelector } from './LanguageSelector';
+export { TranslatedText } from './TranslatedText';
