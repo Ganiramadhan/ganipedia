@@ -8,4 +8,3 @@ export { ChatWidget } from './ChatWidget';
 export { ScrollToTop } from './ScrollToTop';
 export { SEOHead } from './SEOHead';
 export { LanguageSelector } from './LanguageSelector';
-export { TranslatedText } from './TranslatedText';

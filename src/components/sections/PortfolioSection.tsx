@@ -103,7 +103,7 @@ export const PortfolioSection: FC = () => {
   
   const categories = useMemo(() => [allLabel, ...new Set(portfolios.map((p) => p.category))], [allLabel]);
   const [activeCategory, setActiveCategory] = useState(allLabel);
-  const [activeImageIndex, setActiveImageIndex] = useState<Record<string, number>>({});
+  
   const [lightbox, setLightbox] = useState<LightboxState>({
     isOpen: false,
     currentImage: '',
@@ -119,14 +119,16 @@ export const PortfolioSection: FC = () => {
     [activeCategory, allLabel]
   );
 
-  // Initialize active image index for each portfolio
-  useEffect(() => {
+  // Initialize active image index for each portfolio (using useMemo to avoid effect)
+  const initialActiveImageIndex = useMemo(() => {
     const initialIndex: Record<string, number> = {};
     portfolios.forEach(p => {
       initialIndex[p.id] = 0;
     });
-    setActiveImageIndex(initialIndex);
+    return initialIndex;
   }, []);
+
+  const [activeImageIndex, setActiveImageIndex] = useState<Record<string, number>>(initialActiveImageIndex);
 
   const openLightbox = useCallback((portfolioIndex: number, imageIndex: number) => {
     const portfolio = filteredPortfolios[portfolioIndex];

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- Translations object needs to be in same file as context */
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -43,6 +44,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   useEffect(() => {
     const pathLang = location.pathname.split('/')[1];
     if ((pathLang === 'id' || pathLang === 'en') && pathLang !== language) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Required for URL sync
       setLanguage(pathLang);
       localStorage.setItem('ganipedia-lang', pathLang);
     }

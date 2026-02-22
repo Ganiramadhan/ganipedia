@@ -1,57 +1,57 @@
-# Ganipedia - Jasa Pembuatan Website Professional
+# Ganipedia - Professional Web Development Services
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-Website landing page profesional untuk jasa pembuatan website dan solusi digital. Menampilkan portofolio, layanan, dan informasi lengkap tentang Ganipedia.
+A professional landing page showcasing web development services and digital solutions. Features portfolio showcase, service offerings, and complete information about Ganipedia.
 
 ## 🚀 Features
 
-### 🎨 **UI/UX Modern**
-- Desain responsif dengan Tailwind CSS v4
-- Animasi smooth dengan transisi CSS
+### 🎨 **Modern UI/UX**
+- Responsive design with Tailwind CSS v4
+- Smooth animations with CSS transitions
 - Dark/Light mode support 
 - Mobile-first responsive design
 
-### 🌐 **Multi-Language**
-- Dukungan Bahasa Indonesia & English
+### 🌐 **Multi-Language Support**
+- Indonesian & English language support
 - Context-based translation system
-- Toggle bahasa dengan icon bendera
+- Language toggle with flag icons
 
 ### 💼 **Portfolio Showcase**
 - Optimized image loading with lazy loading
 - Interactive image gallery with lightbox
-- Filter berdasarkan kategori
-- Multiple images per portfolio
+- Category-based filtering
+- Multiple images per portfolio item
 - Image validation on build
 - Error handling for missing images
-- Link eksternal ke website asli
+- External links to live websites
 - Responsive grid layout
 
-### 🛠️ **Layanan Digital**
-- Portfolio Website (Rp 500.000)
-- Landing Page (Rp 1.000.000) 
-- Company Profile (Rp 2.500.000)
-- E-Commerce (Rp 10.000.000)
-- POS System (Rp 12.000.000)
-- Custom Web App (Quote)
+### 🛠️ **Digital Services**
+- Portfolio Website (Rp 500,000)
+- Landing Page (Rp 1,000,000) 
+- Company Profile (Rp 2,500,000)
+- E-Commerce (Rp 10,000,000)
+- POS System (Rp 12,000,000)
+- Custom Web Application (Custom Quote)
 
 ### 💬 **Customer Service Chatbot**
 - Floating chat widget
-- Quick replies untuk FAQ
-- Auto-response berdasarkan keyword
-- Integrasi langsung ke WhatsApp
+- Quick replies for frequently asked questions
+- Keyword-based auto-responses
+- Direct WhatsApp integration
 
-### 📊 **Stats & Testimonials**
-- Statistik project selesai: 12+
-- Klien puas: 10+
-- Pengalaman: 3+ tahun
-- Support 24/7
+### 📊 **Statistics & Testimonials**
+- Projects completed: 12+
+- Satisfied clients: 10+
+- Years of experience: 3+
+- 24/7 customer support
 
-### 📱 **Contact & Social**
-- Form kontak dengan validasi
+### 📱 **Contact & Social Media**
+- Contact form with validation
 - WhatsApp integration
 - Social media links (GitHub, LinkedIn, Instagram)
 - Google Maps integration
@@ -78,34 +78,34 @@ Website landing page profesional untuk jasa pembuatan website dan solusi digital
 
 ### Prerequisites
 - Node.js 18+ 
-- PNPM (recommended) atau NPM
-- Docker & Docker Compose (optional, untuk deployment)
+- PNPM (recommended) or NPM
+- Docker & Docker Compose (optional, for deployment)
 
 ### Installation
 
 1. **Clone repository**
-\`\`\`bash
+```bash
 git clone https://github.com/Ganiramadhan/ganipedia-v1.git
 cd ganipedia-v1
-\`\`\`
+```
 
 2. **Install dependencies**
-\`\`\`bash
+```bash
 pnpm install
-\`\`\`
+```
 
 3. **Start development server**
-\`\`\`bash
+```bash
 pnpm dev
-\`\`\`
+```
 
-Server akan berjalan di \`http://localhost:3001\`
+Server will run at `http://localhost:3001`
 
 ## 📦 Available Scripts
 
 | Script | Description |
 |--------|-------------|
-| \`pnpm dev\` | Start development server (port 3001) |
+| `pnpm dev` | Start development server (port 3001) |
 | `pnpm build` | Build for production (validates images first) |
 | `pnpm preview` | Preview production build |
 | `pnpm lint` | Run ESLint |
@@ -114,41 +114,41 @@ Server akan berjalan di \`http://localhost:3001\`
 ## 🏭 Production Build
 
 ### Standard Build
-\`\`\`bash
+```bash
 # Build for production
 pnpm build
 
 # Preview production build
 pnpm preview
-\`\`\`
+```
 
-Build output akan tersedia di folder \`dist/\`
+Build output will be available in the `dist/` folder
 
 ### 🐳 Docker Deployment
 
 **Build Docker Image:**
-\`\`\`bash
+```bash
 docker build -t ganipedia:latest .
-\`\`\`
+```
 
 **Run Container (maps internal port 80 to external 3001):**
-\`\`\`bash
+```bash
 docker run -d -p 3001:80 --name ganipedia ganipedia:latest
-\`\`\`
+```
 
 **Using Docker Compose:**
-\`\`\`bash
+```bash
 docker-compose up -d
-\`\`\`
+```
 
-Website akan tersedia di \`http://localhost:3001\`
+Website will be available at `http://localhost:3001`
 
 **Stop Container:**
-\`\`\`bash
+```bash
 docker stop ganipedia
 # or with docker-compose
 docker-compose down
-\`\`\`
+```
 
 ### 🚀 Production Deployment
 
@@ -161,34 +161,34 @@ docker-compose down
 - Security headers configured
 
 **Environment Variables:**
-\`\`\`bash
+```bash
 # Optional - set in Dockerfile or docker-compose.yml
 NODE_ENV=production
-\`\`\`
+```
 
 ## 📱 Portfolio Projects
 
-Website ini menampilkan 8 project portfolio:
+This website showcases 8 portfolio projects:
 
-1. **BPDA Bujapi Jabar** - Company Profile resmi organisasi
+1. **BPDA Bujapi Jabar** - Official organization company profile
 2. **BPDA Admin CMS** - Content Management System
 3. **BPDA HRMIS** - Human Resource Management System
-4. **Batik Merawit** - Company Profile brand batik tradisional
-5. **TechStart E-Commerce** - Platform e-commerce startup teknologi
-6. **Warung Digital POS** - Point of Sale system untuk UMKM
-7. **Creative Portfolio Studio** - Portfolio website studio kreatif
+4. **Batik Merawit** - Traditional batik brand company profile
+5. **TechStart E-Commerce** - Technology startup e-commerce platform
+6. **Warung Digital POS** - Point of Sale system for small businesses
+7. **Creative Portfolio Studio** - Creative studio portfolio website
 8. **EduLearn LMS** - Learning Management System
 
 ## 🌍 Customization
 
 ### **Content Management**
-Edit \`src/data/index.ts\` untuk update:
+Edit `src/data/index.ts` to update:
 - Portfolio projects
 - Testimonials
 - Statistics
 - Navigation items
 
-**Important**: Setelah menambah portfolio baru dengan gambar, jalankan:
+**Important**: After adding new portfolio with images, run:
 ```bash
 pnpm validate:images
 ```
@@ -202,7 +202,7 @@ pnpm validate:images
 See [docs/IMAGE_OPTIMIZATION.md](docs/IMAGE_OPTIMIZATION.md) for details.
 
 ### **Translations**
-Edit `src/contexts/LanguageContext.tsx` untuk menambah/edit translations.
+Edit `src/contexts/LanguageContext.tsx` to add or edit translations.
 
 ## ⚡ Performance Optimizations
 
@@ -224,34 +224,15 @@ Edit `src/contexts/LanguageContext.tsx` untuk menambah/edit translations.
 
 ## 🆘 Support
 
-Jika ada pertanyaan atau butuh bantuan:
+If you have any questions or need assistance:
 
 1. **WhatsApp**: [+62 838-7862-4702](https://wa.me/6283878624702)
 2. **Email**: hello@ganipedia.com
 
 ---
 
-⭐ **Jika project ini membantu, jangan lupa kasih star di GitHub!**
-import reactDom from 'eslint-plugin-react-dom'
+⭐ **If this project helps you, don't forget to give it a star on GitHub!**
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
